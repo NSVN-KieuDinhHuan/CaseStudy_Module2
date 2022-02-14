@@ -1,23 +1,28 @@
 package com.company.view;
-import com.company.controller.DictionaryDataBase;
+import com.company.controller.DictionaryManagement;
 import com.company.controller.UserManagement;
 import com.company.model.User;
+
+import java.io.IOException;
 import java.util.Scanner;
 
+import static com.company.controller.DictionaryManagement.ADMIN_ROLE;
+import static com.company.controller.DictionaryManagement.MEMBER_ROLE;
+
 public class GuestMenu {
-    DictionaryDataBase dictionaryManagement = DictionaryDataBase.getdictionaryManagement();
+    DictionaryManagement dictionaryManagement = DictionaryManagement.getdictionaryManagement();
     UserManagement userManagement=UserManagement.getUserManagement();
     Usermenu usermenu=new Usermenu();
     AdminMenu adminMenu=new AdminMenu();
     Scanner scanner=new Scanner(System.in);
-    public void run() {
+    public void run() throws IOException, ClassNotFoundException {
         int choice = -1;
         do {
             menu();
             choice = scanner.nextInt();
             switch (choice) {
                 case 1: {
-                    lookupDictionary();
+                    usermenu.lookupDictionary();
                     break;
                 }
                 case 2: {
@@ -32,14 +37,9 @@ public class GuestMenu {
         } while (choice != 0);
     }
 
-    public void lookupDictionary() {
-        System.out.println("Nhập từ cần tra nghĩa");
-        scanner.nextLine();
-        String str= scanner.nextLine();
-        System.out.println(dictionaryManagement.lookUpWord(str));
-    }
 
-    private void doLogin() {
+
+    private void doLogin() throws IOException, ClassNotFoundException {
         System.out.println("Nhập username:");
         scanner.nextLine();
         String username = scanner.nextLine();
@@ -58,7 +58,7 @@ public class GuestMenu {
         }
     }
 
-    private void doRegister() {
+    private void doRegister() throws IOException, ClassNotFoundException {
         String role="";
         int choice = -1;
         do {
@@ -71,17 +71,11 @@ public class GuestMenu {
             scanner.nextLine();
             switch (choice) {
                 case 1: {
-                    role="user";
+                    role=MEMBER_ROLE;
                     break;
                 }
                 case 2: {
-                    System.out.println("Nhập Mật khẩu để đăng ký admin");
-                    String adminPass= scanner.nextLine();
-                    if (adminPass.equals("CodeGym")){
-                        role="admin";
-                    }else {
-                        System.err.println("Mật khẩu không đúng. bạn không thể trở thành admin");
-                    }
+                    role = getAdminRole(role);
                     break;
                 }
                 case 3:{
@@ -89,6 +83,7 @@ public class GuestMenu {
                     break;
                 }
             }
+
         } while (role.equals(""));
         System.out.println("Nhâp Họ và tên");
         String MemberName=scanner.nextLine();
@@ -98,6 +93,18 @@ public class GuestMenu {
         String password = inputPassword();
         User user = new User(username, password,role,MemberName,JapaneseLevel);
         userManagement.register(user);
+        System.out.println("Đăng ký thành công");
+    }
+
+    private String getAdminRole(String role) {
+        System.out.println("Nhập Mật khẩu để đăng ký admin");
+        String adminPass= scanner.nextLine();
+        if (adminPass.equals("CodeGym")){
+            role =ADMIN_ROLE;
+        }else {
+            System.err.println("Mật khẩu không đúng. bạn không thể trở thành admin");
+        }
+        return role;
     }
 
     private String inputPassword() {

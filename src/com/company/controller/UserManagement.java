@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserManagement implements ReadFile,WriteFile {
-
+    private static final String USER_DATA_STORAGE = "user.txt";
     private List<User> users = new ArrayList<>();
     private static UserManagement instance;
     public static UserManagement getUserManagement(){
@@ -17,10 +17,10 @@ public class UserManagement implements ReadFile,WriteFile {
         return instance;
     }
     public UserManagement() {
-        File file = new File("user.txt");
+        File file = new File(USER_DATA_STORAGE);
         if (file.exists()) {
             try {
-                readFile("user.txt");
+                readFile(USER_DATA_STORAGE);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -28,12 +28,8 @@ public class UserManagement implements ReadFile,WriteFile {
 
     }
 
-    public void displayAll(String role) {
-        try {
-            readFile("user.txt");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public void displayAllUser(String role) throws IOException, ClassNotFoundException {
+            readFile(USER_DATA_STORAGE);
         for (User user : users) {
             if (user.getRole().equals(role)) {
                 System.out.println(user);
@@ -41,22 +37,18 @@ public class UserManagement implements ReadFile,WriteFile {
         }
     }
 
-    public void deleteMember(String username){
+    public void removeUser(String username,String role) throws IOException {
         for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getLoginName().equals(username) && users.get(i).getRole().equals("user")){
+            if (users.get(i).getLoginName().equals(username) && users.get(i).getRole().equals(role)) {
                 users.remove(users.get(i));
             }
         }
-
+        writeFile(USER_DATA_STORAGE);
     }
 
-    public void register(User user) {
+    public void register(User user) throws IOException {
         this.users.add(user);
-        try {
-            writeFile("user.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writeFile(USER_DATA_STORAGE);
     }
     @Override
     public void readFile(String path) throws IOException, ClassNotFoundException {

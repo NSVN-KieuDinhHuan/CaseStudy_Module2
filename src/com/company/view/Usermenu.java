@@ -1,33 +1,38 @@
 package com.company.view;
 
-import com.company.controller.DictionaryDataBase;
+import com.company.controller.DictionaryManagement;
 import com.company.model.JapanVietnamDictionary;
 import com.company.model.JapaneseWord;
+
+import java.io.IOException;
 import java.util.Scanner;
 
+import static com.company.controller.DictionaryManagement.MEMBER_ROLE;
+
 public class Usermenu{
-    DictionaryDataBase dictionaryDataBase = DictionaryDataBase.getdictionaryManagement();
+    DictionaryManagement dictionaryManagement = DictionaryManagement.getdictionaryManagement();
     Scanner scanner =new Scanner(System.in);
-   public void run(){
+   public void run() throws IOException, ClassNotFoundException {
         int choice = -1;
         do {
             menu();
             choice = scanner.nextInt();
+            scanner.nextLine();
             switch (choice) {
                 case 1: {
                     lookupDictionary();
                     break;
                 }
                 case 2: {
-                    inputJapanword();
+                    inputJapanword(MEMBER_ROLE);
                     break;
                 }
                 case 3:{
-                    removeWord();
+                    removeWord(MEMBER_ROLE);
                     break;
                 }
                 case 4:{
-                    dictionaryDataBase.displayAllWord();
+                    displayAllDictionary();
                     break;
                 }
 
@@ -36,24 +41,25 @@ public class Usermenu{
 
     }
 
+    void displayAllDictionary() throws IOException, ClassNotFoundException {
+        dictionaryManagement.displayAllWord();
+    }
+
     public void lookupDictionary() {
         System.out.println("Nhập từ cần tra nghĩa");
-        scanner.nextLine();
         String str= scanner.nextLine();
-        System.out.println(dictionaryDataBase.lookUpWord(str));
+        System.out.println(dictionaryManagement.lookUpWord(str));
     }
 
-    public void removeWord() {
+    public void removeWord(String role) throws IOException {
         System.out.println("Nhập từ cần xóa");
-        scanner.nextLine();
         String Word=scanner.nextLine();
-        dictionaryDataBase.removeWord(Word,"user");
+        dictionaryManagement.removeWord(Word,role);
     }
 
-    public void inputJapanword() {
+    public void inputJapanword(String role) throws IOException, ClassNotFoundException {
         System.out.println("_____Thêm từ Tiếng nhật vào trong từ điển_______");
         System.out.println(" Thêm chữ Kanji");
-        scanner.nextLine();
         String kanji=scanner.nextLine();
         System.out.println("Thêm chữ Hiragana");
         String hiragana=scanner.nextLine();
@@ -69,7 +75,7 @@ public class Usermenu{
         System.out.println("Nghĩa của câu trên");
         String meaningOfSentence= scanner.nextLine();
         JapanVietnamDictionary japanVietnamDictionary= new JapanVietnamDictionary(japaneseWord,wordType,meaning,sentence,meaningOfSentence);
-        dictionaryDataBase.addNewWord(japanVietnamDictionary,"user");
+        dictionaryManagement.addNewWord(japanVietnamDictionary,role);
     }
 
     private void menu() {

@@ -1,134 +1,129 @@
 package com.company.view;
-import com.company.controller.DictionaryDataBase;
+import com.company.controller.DictionaryManagement;
 import com.company.controller.UserManagement;
-import com.company.model.JapanVietnamDictionary;
-import com.company.model.JapaneseWord;
+
 import java.io.IOException;
 import java.util.Scanner;
 
+import static com.company.controller.DictionaryManagement.ADMIN_ROLE;
+import static com.company.controller.DictionaryManagement.MEMBER_ROLE;
+
 public class AdminMenu {
-    DictionaryDataBase dictionaryDataBase = DictionaryDataBase.getdictionaryManagement();
-    UserManagement userManagement=new UserManagement();
+    DictionaryManagement dictionaryManagement = DictionaryManagement.getdictionaryManagement();
+    UserManagement userManagement=UserManagement.getUserManagement();
+    Usermenu usermenu =new Usermenu();
     Scanner scanner =new Scanner(System.in);
-    public void run(){
+    public void run() throws IOException, ClassNotFoundException {
         int choice = -1;
         do {
             menu();
             choice = scanner.nextInt();
             switch (choice) {
                 case 1: {
-                    System.out.println("Nhập từ cần tra nghĩa");
-                    scanner.nextLine();
-                    String str= scanner.nextLine();
-                    System.out.println(dictionaryDataBase.lookUpWord(str));
+                    usermenu.lookupDictionary();
                     break;
                 }
                 case 2: {
-                    inputJapanword();
+                    usermenu.inputJapanword(ADMIN_ROLE);
                     break;
-                }
-                case 3:{
-                    System.out.println("Nhập từ cần xóa");
-                    String Word=scanner.nextLine();
-                    dictionaryDataBase.removeWord(Word,"admin");
+                } case 3:{
+                    usermenu.removeWord(ADMIN_ROLE);
                     break;
                 }
                 case 4:{
-                    dictionaryDataBase.displayAllWord();
+                    usermenu.displayAllDictionary();
                     break;
                 }
 
-                case 5:{
-
-                    if (dictionaryDataBase.getAddTemporaryWord().size()>0) {
-                        dictionaryDataBase.displayAddTemprorayWord();
-                        System.out.println("Lựa chon từ số?");
-                        scanner.nextLine();
-                        int index = scanner.nextInt();
-                        dictionaryDataBase.approveaAddWord(index);
-                    }else {
-                        System.err.println("Không có đề xuất nào của member");
-                    }
-                    break;
-
-                }
-                case 6:{
-                    if (dictionaryDataBase.getRemoveTemporaryWord().size()>0) {
-                        System.out.println("Danh sách đề xuất xóa từ của member");
-                        dictionaryDataBase.displayRemoveTemprorayWord();
-                        System.out.println("Lựa chon từ số?");
-                        scanner.nextLine();
-                        int index = scanner.nextInt();
-                        dictionaryDataBase.approvearemoveWord(index);
-
-                    }else {
-                        System.err.println("không có đề xuất nào của member");
-                    }
+                case 5: {
+                    checkAdditionWord();
                     break;
                 }
-                case 7:{
-                    try {
-                        dictionaryDataBase.deletOfferOfMember();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                case 6: {
+                    checkRemovalWord();
+                }
+                case 7: {
+                    dictionaryManagement.removeAllSuggestion();
                     break;
                 }
                 case 8:{
-                    userManagement.displayAll("user");
+                    userManagement.displayAllUser(MEMBER_ROLE);
                     break;
                 }
                 case 9:{
-                    userManagement.displayAll("admin");
+                    userManagement.displayAllUser(ADMIN_ROLE);
                     break;
                 }
                 case 10:{
-                    System.out.println("Nhâp tên đăng nhập để xóa member");
-                    scanner.nextLine();
-                    String member=scanner.nextLine();
-                    userManagement.deleteMember(member);
-                    break;
+                    removeMember();
                 }
             }
         } while (choice != 0);
     }
 
-    public void inputJapanword() {
-        System.out.println("_____Thêm từ Tiếng nhật vào trong từ điển_______");
-        System.out.println(" Thêm chữ Kanji");
+    private void checkRemovalWord() throws IOException, ClassNotFoundException {
+        int choice2 = -1;
+
+        do {
+            dictionaryManagement.displayRemovalSuggestion();
+            System.out.println("chọn -1 để thoát?");
+            System.out.println("Chấp thuận với từ số ?");
+            scanner.nextLine();
+            choice2 = scanner.nextInt();
+            switch (choice2){
+                case -1: {
+                    break;
+                } default: {
+                    if (dictionaryManagement.getOfferRemovalList().size() > 0) {
+                        dictionaryManagement.approveaRemoval(choice2);
+                    } else {
+                        System.err.println("lựa chọn lại");
+                    }
+                    break;
+                }
+            }
+        } while (choice2!= -1);
+    }
+
+    private void checkAdditionWord() throws IOException, ClassNotFoundException {
+        int  choice1=-1;
+        do {
+            dictionaryManagement.displayAdditionSuggestion();
+            System.out.println("chọn -1 để thoát?");
+            System.out.println("Chấp thuận với từ số ?");
+            scanner.nextLine();
+            choice1 = scanner.nextInt();
+            switch (choice1){
+                case -1:{
+                    break;
+                } default:{
+                    if (dictionaryManagement.getOfferAdditionList().size() > 0) {
+                        dictionaryManagement.approveAddition(choice1);
+                    }else {
+                        System.out.println("lựa chọn lại");
+                    }
+                    break;
+                }
+            }
+
+        } while (choice1!=-1);
+    }
+
+    private void removeMember() throws IOException {
+        System.out.println("Nhập tên đăng nhập của member muốn xóa");
         scanner.nextLine();
-        String kanji=scanner.nextLine();
-        System.out.println("Thêm chữ Hiragana");
-        String hiragana=scanner.nextLine();
-        System.out.println("Thêm cách đọc");
-        String pronunciation=scanner.nextLine();
-        System.out.println("Từ loại");
-        String wordType=scanner.nextLine();
-        System.out.println("Nghĩa là gì?");
-        String meaning=scanner.nextLine();
-        JapaneseWord japaneseWord=new JapaneseWord(kanji,hiragana,pronunciation);
-        System.out.println("Ví Dụ về từ tiếng nhật đã thêm vào");
-        String sentence= scanner.nextLine();
-        System.out.println("Nghĩa của câu trên");
-        String meaningOfSentence= scanner.nextLine();
-        JapanVietnamDictionary japanVietnamDictionary= new JapanVietnamDictionary(japaneseWord,wordType,meaning,sentence,meaningOfSentence);
-        dictionaryDataBase.addNewWord(japanVietnamDictionary,"admin");
+        String member=scanner.nextLine();
+        userManagement.removeUser(member,MEMBER_ROLE);
+        System.out.println("đã xóa member:"+member);
     }
-
-    private void removeMember() {
-        System.out.println("Nhập tên đăng nhập cần xóa");
-        String user=scanner.nextLine();
-        userManagement.deleteMember(user);
-    }
-
     private void menu() {
         System.out.println("_______Admin menu______");
         System.out.println("1. Tra từ điển Nhật-Việt");
         System.out.println("2. Thêm từ ");
         System.out.println("3. Xóa Từ ");
         System.out.println("4. Hiện thị tất cả từ");
-        System.out.println("5. Phê duyet đề xuất Thêm từ");
-        System.out.println("6. Phê Duyệt đề xuất xóa từ");
+        System.out.println("5. Kiểm tra đề xuất Thêm từ của member");
+        System.out.println("6. Kiểm tra đề xuất xóa từ của member");
         System.out.println("7. Xóa tất cả các đề xuất của member");
         System.out.println("8. Hiện thị tất cả member");
         System.out.println("9. Hiện thị tất cả các admin");

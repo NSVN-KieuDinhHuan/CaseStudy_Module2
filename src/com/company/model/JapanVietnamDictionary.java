@@ -62,9 +62,9 @@ public class JapanVietnamDictionary  implements Serializable  {
      @Override
      public String toString() {
           return   "----------------------------"+ '\n' +
-                  japaneseWord +'\n' +
+                  japaneseWord  +
                   "*" + wordType + '\n' +
-                   meaning + '\n' +
+                  "Nghĩa:"+ meaning + '\n' +
                   " " + sentence + '\n' +
                   " " + meaningOfSentence + '\n';
 
